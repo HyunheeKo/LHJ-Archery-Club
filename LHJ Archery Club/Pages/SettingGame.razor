@@ -1,0 +1,98 @@
+﻿@page "/SettingGame"
+<h3>게임설정</h3>
+
+@using Radzen
+@using Radzen.Blazor
+@inject NavigationManager NavigationManager
+@using Microsoft.Extensions.Logging
+@inject ILogger<SettingGame> _logger
+@inject IJSRuntime JSRuntime
+
+<br />
+<RadzenCard>
+<h4 class="mb-4">샷수</h4>
+<RadzenRadioButtonList @bind-Value=@nShot TValue="int" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
+    <Items>
+        <RadzenRadioButtonListItem Text="3" Value="3" />
+        <RadzenRadioButtonListItem Text="6" Value="6" />
+    </Items>
+</RadzenRadioButtonList>
+</RadzenCard>
+<br />
+
+<RadzenCard>
+<h4 class="mb-4">인원수</h4>
+<RadzenRadioButtonList @bind-Value=@nPeple TValue="int" Change=@((args) => OnChange(args, "RadioButtonList with horizontal orientation"))>
+    <Items>
+        <RadzenRadioButtonListItem Text="1" Value="1"  />
+        <RadzenRadioButtonListItem Text="2" Value="2" />
+        <RadzenRadioButtonListItem Text="3" Value="3" />
+        <RadzenRadioButtonListItem Text="4" Value="4" />
+        <RadzenRadioButtonListItem Text="5" Value="5" />
+        <RadzenRadioButtonListItem Text="6" Value="6" />
+    </Items>
+</RadzenRadioButtonList>
+
+        <div class="row">
+@for (int i = 0; i < nPeple; i++)
+    {
+        int a = i;
+            <div class="col-2 p-1">
+                <RadzenLabel class="text-right" Text="이름"></RadzenLabel>
+            </div>
+            <div class="col-4">
+                <RadzenTextBox class="w-100" Value=@sNames[a] MaxLength="3"></RadzenTextBox>
+
+            </div>
+    }
+        </div>
+
+</RadzenCard>
+
+
+
+
+<div class="row">
+    <div class="col-12 mt-3" style="height:80px;">
+        <RadzenButton Click=@(args => OnClick_NewGame("Info icon button")) Icon="privacy_tip" class="w-100 h-100" ButtonStyle="ButtonStyle.Info" Text="게임 시작" Style="font-size:larger" />
+
+    </div>
+</div>
+
+
+@code {
+    int nShot = 3;
+    int nPeple = 1;
+
+    List<string> sNames = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _logger.LogInformation("Init");
+        sNames.Add("");
+
+        await JSRuntime.InvokeVoidAsync("console.log", "some js runtime log");
+    }
+
+    void OnChange(int? value, string name)
+    {
+        _logger.LogInformation("peple count : " + value);
+
+        sNames.Clear();
+
+        for(int i = 0; i < nPeple; i++)
+        {
+            sNames.Add("");
+        }
+        JSRuntime.InvokeVoidAsync("console.log", "Change Value : " + value);
+
+        //for
+        //console.Log($"{name} value changed to {value}");
+    }
+
+    void OnClick_NewGame(string buttonName)
+    {
+        NavigationManager.NavigateTo("Counter");
+        //console.Log($"{buttonName} clicked");
+    }
+}

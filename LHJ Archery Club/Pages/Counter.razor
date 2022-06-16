@@ -1,0 +1,74 @@
+﻿@page "/counter"
+@using Radzen
+@using Radzen.Blazor
+
+<h1 class="text-center" style="font-size:4em">@currentCount</h1>
+
+
+<RadzenCard>
+<div class="row">
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="10" Click="() => IncrementCount(10)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Warning"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="9" Click="() => IncrementCount(9)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Warning"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="8" Click="() => IncrementCount(8)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Danger"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="7" Click="() => IncrementCount(7)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Danger"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="6" Click="() => IncrementCount(6)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Success"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="5" Click="() => IncrementCount(5)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Success"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="4" Click="() => IncrementCount(4)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Info"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="3" Click="() => IncrementCount(3)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Info"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="2" Click="() => IncrementCount(2)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Light"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="1" Click="() => IncrementCount(1)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Light"></RadzenButton>
+    </div>
+    <div class="col-3 p-1" style="height:70px;">
+            <RadzenButton Text="0" Click="() => IncrementCount(0)" class="w-100 h-100 p-1"  ButtonStyle="ButtonStyle.Light"></RadzenButton>
+    </div>
+</div>
+
+</RadzenCard>
+
+
+@code {
+    [Parameter]
+    public int ShotCount { get; set; }
+    public int PepleCount { get; set; }
+
+    private int currentCount = 0;
+
+    void OnChangeTabs(int index)
+    {
+        //console.Log($"Tab with index {index} was selected.");
+    }
+
+    private void IncrementCount()
+    {
+        currentCount++;
+    }
+
+    private void IncrementCount(int count)
+    {
+        currentCount += count;
+    }
+    private void DecrementCount(int count)
+    {
+        currentCount -= count;
+    }
+
+}

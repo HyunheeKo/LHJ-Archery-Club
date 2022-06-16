@@ -1,0 +1,350 @@
+﻿@page "/Scoreboard"
+
+@using LHJ_Archery_Club.Data
+@using Radzen.Blazor
+@using Radzen
+@using System.Text.Json
+@using Microsoft.Extensions.Logging
+@inject ILogger<Scoreboard> _logger
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@inject Blazored.LocalStorage.ILocalStorageService localStore
+@inject DialogService DialogService
+
+<div class="row">
+    <div class="col-4">
+        <RadzenButton Icon="arrow_back" Click='() => NavigationManager.NavigateTo("/", false)' ></RadzenButton>
+    </div>
+    <div class="col-8">
+        <h3>점수 기록</h3>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-12 text-gray text-left mb-0">
+        <p class="m-0">@DateTime.Now.ToString("yyyy/MM/dd hh:mm tt")</p>
+    </div>
+    <div class="col-12 text-primary text-center ">
+        <h1>@nTotalScore</h1>
+    </div>
+    <div class="col-12 mt-3 mb-3">
+        @*세트 스코어 보드*@
+        <div class="row">
+            @for (int i = 0; i < scoreboard?.Sets.Count; i++)
+            {
+                int a = i;
+                <div class="col-3">
+
+                    <div class="row">
+                        <!--세트-->
+                        @if(nIndexSet == a)
+                        {
+                            <div class="col-12 text-center bg-primary text-white border-right-1 border-white ">
+                                @(a + 1) SET
+                            </div>
+                        } else
+                        {
+                            <div class="col-12 text-center bg-info text-white border-right-1 border-white ">
+                                @(a + 1) SET
+                            </div>
+                        }
+                        <!--점수-->
+                        @if(nIndexSet == a && nIndexScore == 0)
+                        {
+                        <div class="col-4 p-1 text-center bg-primary border-bottom-1 border-left-1 border-gray">
+                            @scoreboard.Sets[a].First
+                        </div>                      
+                        } else {
+
+                        <div class="col-4 p-1 text-center text-gray border-bottom-1 border-left-1 border-gray">
+                            @scoreboard.Sets[a].First
+                        </div>
+                        }
+
+                        @if(nIndexSet == a && nIndexScore == 1)
+                        {
+                        <div class="col-4 p-1 text-center bg-primary border-bottom-1 border-left-1 border-gray">
+                            @scoreboard.Sets[a].Second
+                        </div>                    
+                        } else {
+                        <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray">
+                            @scoreboard.Sets[a].Second
+                        </div>
+
+                        }
+
+                        
+                        @if(nIndexSet == a && nIndexScore == 2)
+                        {
+                         <div class="col-4 p-1 text-center bg-primary border-bottom-1 border-left-1 border-right-1 border-gray">
+                            @scoreboard.Sets[a].Third
+                        </div>
+                   
+                        } else {
+
+                        <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-right-1 border-gray">
+                            @scoreboard.Sets[a].Third
+                        </div>
+
+                        }
+
+
+
+                    </div>
+
+                </div>
+            }
+        </div>
+    </div>
+
+</div>
+<hr />
+<div class="row">
+    <div class="col-12">
+        @*점수 선택 버튼*@
+        <div class="row">
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(10)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Warning"><h2>10</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(9)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Warning"><h2>9</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(8)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Danger"><h2>8</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(7)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Danger"><h2>7</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(6)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Success"><h2>6</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(5)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Success"><h2>5</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(4)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Info"><h2>4</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(3)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Info"><h2>3</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(2)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Light"><h2>2</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(1)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Light"><h2>1</h2</RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(0)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Light"><h2>0</h2></RadzenButton>
+            </div>
+            <div class="col-3 p-1" style="height:70px;">
+                <RadzenButton Click="() => Eraser()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Danger"><i class="fas fa-arrow-left"></i></RadzenButton>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+</div>
+<hr />
+
+<Div>
+    <div class="col-12">
+        @*이전, 다음, 종료 버튼*@
+        <Div Class="row">
+        <div class="col-4" style="height:60px;">  
+            <RadzenButton Click="() => Reset()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Info">RESSET</RadzenButton>
+        </div>
+        <div class="col-4" style="height:60px;">
+            <RadzenButton Click="() => Save()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Secondary" Disabled=@isDisable>저장</RadzenButton>
+        </div>
+
+        <div class="col-4" style="height:60px;">
+            <RadzenButton Click="() => End()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Danger">종료</RadzenButton>
+        </div>
+        </Div>
+
+    </div>
+
+
+</Div>
+
+@code {
+    //RadzenDataGrid<ScoreboardModel> scoreGrid;
+    ScoreboardModel scoreboard = new();
+    int nTotalScore = 0;
+
+    int nIndexSet = 0;
+    int nIndexScore = 0;
+
+    bool isDisable = true;
+
+    protected override void OnInitialized()
+    {
+        //ScoreboardModel scoreboard = new();
+        //scores = dbContext.scores.Include("Customer").Include("Employee").ToList();
+        //scores = new List<ScoreboardModel>();
+        //scores.Add(new());
+
+        scoreboard.Sets = new List<Set>();
+        for (int i = 0; i < 12; i++)
+        {
+            Set s = new Set();
+            s.First = 0;
+            s.Second = 0;
+            s.Third = 0;
+
+            scoreboard.Sets.Add(s);
+        }
+
+        _logger.LogError("tag -----@@@@@@@@@@-----");
+        JSRuntime.InvokeVoidAsync("console.log", "Change Value @@@@@@@@@@@@@@@::::::::::: ");
+    }
+
+    private void IncrementCount(int count)
+    {
+
+        if(nIndexSet < 12)
+        {
+            nTotalScore += count;
+
+            switch(nIndexScore)
+            {
+                case 0 :
+                    {
+                        scoreboard.Sets[nIndexSet].First = count;
+                        break;
+                    }
+                case 1 :
+                    {
+                        scoreboard.Sets[nIndexSet].Second = count;
+                        break;
+                    }
+                case 2 :
+                    {
+                        scoreboard.Sets[nIndexSet].Third = count;
+                        break;
+                    }
+            }
+
+
+            // 인덱스 설정 - 점수 계산하고 다음단계로 이동
+            nIndexScore++;
+
+            if(nIndexScore >=3)
+            {
+                nIndexSet++;
+                nIndexScore = 0;
+
+                if(nIndexSet >=12)
+                {
+                    // 저장버튼 활성화
+                    isDisable = false;
+
+                    // 마지막 세트
+                    //nIndexSet = 11;
+                }
+            }
+        }
+
+    }
+    private void DecrementCount(int count)
+    {
+        nTotalScore -= count;
+    }
+
+    private void Eraser()
+    {
+        if(nIndexScore == 0)
+        {
+            nIndexSet--;
+            nIndexScore = 2;
+
+            if(nIndexSet  < 0)
+            {
+                nIndexSet = 0;          
+                nIndexScore = 0;      
+            }
+        } else
+        {
+            nIndexScore--;
+        }
+
+
+        // 계산
+        switch(nIndexScore)
+        {
+            case 0 :
+                {
+                    nTotalScore -= scoreboard.Sets[nIndexSet].First;
+                    scoreboard.Sets[nIndexSet].First = 0;
+                    break;
+                }
+            case 1 :
+                {
+                    nTotalScore -= scoreboard.Sets[nIndexSet].Second;
+                    scoreboard.Sets[nIndexSet].Second = 0;
+                    break;
+                }
+            case 2 :
+                {
+                    nTotalScore -= scoreboard.Sets[nIndexSet].Third;
+                    scoreboard.Sets[nIndexSet].Third = 0;
+                    break;
+                }
+        }
+
+    }
+
+    private void Reset()
+    {
+        scoreboard.Sets.Clear();
+        scoreboard.Score = 0;
+
+        scoreboard.Sets = new List<Set>();
+        for (int i = 0; i < 12; i++)
+        {
+            Set s = new Set();
+            s.First = 0;
+            s.Second = 0;
+            s.Third = 0;
+
+            scoreboard.Sets.Add(s);
+        }
+
+        nIndexSet = 0;
+        nIndexScore = 0;
+        nTotalScore = 0;
+
+        // 저장버튼 비활성화
+        isDisable = true;
+
+        //localStore.ClearAsync();
+    }
+
+    private async Task Save()
+    {
+        // 최종 점수
+        scoreboard.Score = nTotalScore;
+        string json = JsonSerializer.Serialize(scoreboard);
+        // 저장 키를 Ticks로 하고 이를 복원하여 날짜 비교를 한다.
+        
+        //string key = DateTime.Today.Ticks.ToString();
+        //string key = DateTime.Today.AddDays(-2).Ticks.ToString();
+        string key = DateTime.Now.Ticks.ToString();
+        await localStore.SetItemAsync(key, json);
+
+        // 저장버튼 비활성화
+        isDisable = true;
+    }
+
+    private void End()
+    {
+        NavigationManager.NavigateTo("/");
+        
+    }
+
+}

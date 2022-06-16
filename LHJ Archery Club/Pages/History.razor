@@ -1,0 +1,291 @@
+﻿@page "/history"
+@using LHJ_Archery_Club.Data
+@*//@using Microsoft.Extensions.Logging*@
+@using System.Text.Json;
+@using Radzen
+
+
+@*//@inject ILogger<History> _logger*@
+
+@inject Blazored.LocalStorage.ILocalStorageService localStorage
+@inject IJSRuntime JSRuntime
+@inject DialogService DialogService
+@inject NavigationManager NavigationManager
+
+<div class="row">
+    <div class="col-4">
+        <RadzenButton Icon="arrow_back" Click='() => NavigationManager.NavigateTo("/", false)' ></RadzenButton>
+    </div>
+    <div class="col-8">
+        <h3>기록 보기</h3>
+    </div>
+</div>
+
+<hr />
+
+<div class="row">
+    @*LoadData="@OnLoadData"*@
+    @*LoadData="@SetCalenderScore" *@
+    <RadzenScheduler @ref=@scheduler Data=@appointments TItem="Appointment" style="height: 380px; font-size:0.75em"
+    StartProperty="Start" EndProperty="End" TextProperty="Text" 
+    SlotRender=@OnSlotRender SlotSelect=@OnSlotSelect AppointmentRender=@OnAppointmentRender AppointmentSelect="@OnAppointmentSelect">
+
+
+            <RadzenMonthView />
+    </RadzenScheduler>
+</div>
+
+<hr />
+
+<div class="row">
+    <div class="col-12 mt-3 mb-3">
+        @foreach(var kv in dicScores)
+        {
+            if(kv.Key.Date == scheduler.CurrentDate.Date)
+            {
+                <div class="row">
+                    <div class="col-7">
+                        <RadzenIcon Icon="calendar_month" IconStyle="Radzen.IconStyle.Secondary" />@kv.Key.ToString("yyyy/MM/dd hh:mm tt")
+                    </div>
+                    <div class="col-5 text-right">
+                        <RadzenIcon Icon="assessment" IconStyle="Radzen.IconStyle.Secondary" />점수 : @kv.Value.Score
+                    </div>
+                </div>
+                @*세트 스코어 보드*@
+                <div class="row">
+                    @for (int i = 0; i < kv.Value.Sets.Count; i++)
+                    {
+                        int a = i;
+                        <div class="col-3">
+
+                            <div class="row">
+                                <!--세트-->
+                                <div class="col-12 text-center bg-info text-white border-right-1 border-white">
+                                    @(a + 1) SET
+                                </div>
+                                <!--점수-->
+                                <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray text-muted">
+                                    @kv.Value.Sets[a].First
+                                </div>
+                                <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray text-muted">
+                                    @kv.Value.Sets[a].Second
+                                </div>
+                                <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-right-1 border-gray text-muted">
+                                    @kv.Value.Sets[a].Third
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                </div>
+                
+                <hr />
+            }
+        }
+        @*세트 스코어 보드*@
+        @*<div class="row">
+            @for (int i = 0; i < scoreboard?.Sets.Count; i++)
+            {
+                int a = i;
+                <div class="col-3">
+
+                    <div class="row">
+                        <!--세트-->
+                        <div class="col-12 text-center bg-info text-white border-right-1 border-white">
+                            @(a + 1) SET
+                        </div>
+                        <!--점수-->
+                        <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray">
+                            @scoreboard.Sets[a].First
+                        </div>
+                        <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray">
+                            @scoreboard.Sets[a].Second
+                        </div>
+                        <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-right-1 border-gray">
+                            @scoreboard.Sets[a].Third
+                        </div>
+
+                    </div>
+
+                </div>
+            }
+        </div>*@
+    </div>
+
+</div>
+@code {
+
+    //EventConsole console;
+
+    //ScoreboardModel scoreboard;
+    //int nTotalScore = 0;
+
+    RadzenScheduler<Appointment> scheduler;
+    Dictionary<DateTime, string> events = new Dictionary<DateTime, string>();
+
+
+    //DateTime _selectDate;
+    //int nSelectMonth;
+
+    // 저장된 스코어들
+    Dictionary<DateTime, ScoreboardModel> dicScores = new();
+
+    IList<Appointment> appointments = new List<Appointment>()
+    {
+        new Appointment { Start = DateTime.Today.AddDays(-2), End = DateTime.Today.AddDays(-2), Text = "Birthday" },
+        new Appointment { Start = DateTime.Today.AddDays(-11), End = DateTime.Today.AddDays(-10), Text = "Day off" },
+        //new Appointment { Start = DateTime.Today.AddDays(-10), End = DateTime.Today.AddDays(-8), Text = "Work from home" },
+        //new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(12), Text = "Online meeting" },
+        //new Appointment { Start = DateTime.Today.AddHours(10), End = DateTime.Today.AddHours(13), Text = "Skype call" },
+        //new Appointment { Start = DateTime.Today.AddHours(14), End = DateTime.Today.AddHours(14).AddMinutes(30), Text = "Dentist appointment" },
+        //new Appointment { Start = DateTime.Today.AddDays(1), End = DateTime.Today.AddDays(12), Text = "Vacation" },
+    };
+
+    async Task<bool> LoadData()
+    {
+        var keys = await localStorage.KeysAsync();
+
+        dicScores.Clear();
+
+        try
+        {
+            // 저장된 데이터 전체 로딩
+            // key 값은 datetime의 ticks 임. value는 scoreboardModel의 json 형태임.
+            foreach(var key in keys)
+            {
+                string data = await localStorage.GetItemAsync<string>(key);
+
+                DateTime dt = new DateTime(long.Parse(key));                
+                ScoreboardModel score = JsonSerializer.Deserialize<ScoreboardModel>(data);
+
+                // 데이터 담아둠.
+                dicScores.Add(dt, score);
+            }
+        } catch (Exception ex)
+        {
+            //_logger.LogError(ex.Message);
+            await JSRuntime.InvokeVoidAsync("console.log", ex.Message);
+            return false;
+        }
+
+        return true;
+    }
+
+    void SetCalenderScore()
+    {
+        // 포인트 초기화
+        appointments.Clear();
+
+        if(dicScores != null)
+        {
+            foreach(var kv in dicScores)
+            {
+                if(kv.Key.Month == scheduler.CurrentDate.Month)
+                {
+                    Appointment ap = new Appointment { Start = kv.Key, End = kv.Key, Text = kv.Value.Score.ToString() };
+                    appointments.Add(ap);
+                }
+            }
+            scheduler.Reload();
+        }
+
+        //StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //_logger.LogInformation("OnInitializedAsync");
+
+        // 로컬 스토리지 데이터 읽어옴.
+        await LoadData();
+
+        // 캘린터 셋팅
+        SetCalenderScore();            
+
+
+        await JSRuntime.InvokeVoidAsync("console.log", "Change Value @@@@@@@@@@@@@@@::::::::::: ");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if(firstRender)
+        {
+            // 캘린터 셋팅
+            SetCalenderScore();                        
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+
+
+    void OnSlotRender(SchedulerSlotRenderEventArgs args) 
+    {
+        // Highlight today in month view
+        if (args.View.Text == "Month" && args.Start.Date == DateTime.Today)
+        {
+            args.Attributes["style"] = "background: rgba(255,220,40,.4);";
+        }
+
+        // 선택한 날짜
+        if(args.Start.Date == scheduler.CurrentDate)
+        {
+            args.Attributes["style"] = "background: #ffc107;";            
+        }
+
+        // Highlight working hours (9-18)
+        if ((args.View.Text == "Week" || args.View.Text == "Day") && args.Start.Hour > 8 && args.Start.Hour < 19)
+        {
+            args.Attributes["style"] = "background: rgba(255,220,40,.2);";
+        }
+    }
+
+    async Task OnSlotSelect(SchedulerSlotSelectEventArgs args)
+    {
+        //_logger.LogInformation($"SlotSelect: Start={args.Start} End={args.End}");
+
+        await JSRuntime.InvokeVoidAsync("console.log", $"SlotSelect: Start={args.Start} End={args.End}");
+
+        //console.Log($"SlotSelect: Start={args.Start} End={args.End}");
+
+        //Appointment data = await DialogService.OpenAsync<AddAppointmentPage>("Add Appointment",
+        //    new Dictionary<string, object> { { "Start", args.Start }, { "End", args.End } });
+
+        //_selectDate = args.Start;
+        scheduler.CurrentDate = args.Start;
+
+        //if (data != null)
+        //{
+        //    appointments.Add(data);
+        //    // Either call the Reload method or reassign the Data property of the Scheduler
+        //    await scheduler.Reload();
+        //}
+    }
+
+    async Task OnAppointmentSelect(SchedulerAppointmentSelectEventArgs<Appointment> args)
+    {
+        //_logger.LogInformation($"AppointmentSelect: Appointment={args.Data.Text}");
+
+        await JSRuntime.InvokeVoidAsync("console.log", $"AppointmentSelect: Appointment={args.Data.Text}");
+
+
+        scheduler.CurrentDate = args.Start;
+
+        //console.Log($"AppointmentSelect: Appointment={args.Data.Text}");
+
+        //await DialogService.OpenAsync<EditAppointmentPage>("Edit Appointment", new Dictionary<string, object> { { "Appointment", args.Data } });
+
+        //await scheduler.Reload();
+    }
+
+    void OnAppointmentRender(SchedulerAppointmentRenderEventArgs<Appointment> args)
+    {
+        // Never call StateHasChanged in AppointmentRender - would lead to infinite loop
+
+        if (args.Data.Text == "Birthday")
+        {
+            args.Attributes["style"] = "background: red";
+        }
+    }
+}
