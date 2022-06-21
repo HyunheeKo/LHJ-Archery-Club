@@ -11,21 +11,25 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStore
 @inject DialogService DialogService
 
-<div class="row">
-    <div class="col-4">
-        <RadzenButton Icon="arrow_back" Click='() => NavigationManager.NavigateTo("/", false)' ></RadzenButton>
+<div class="row mb-0 p-0">
+    <div class="col-3">
+        <RadzenButton Icon="arrow_back" ButtonStyle="ButtonStyle.Secondary" Click='() => JSRuntime.InvokeVoidAsync("history.back")' ></RadzenButton>
     </div>
-    <div class="col-8">
-        <h3>점수 기록</h3>
+    <div class="col-6 text-center">
+        <h3 class="mb-0">점수 기록</h3>
+        <p class="m-0">@DateTime.Now.ToString("yyyy/MM/dd hh:mm tt")</p>
     </div>
+
+    <div class="col-3">
+    
+    </div>
+
 </div>
 
 <hr />
 
 <div class="row">
-    <div class="col-12 text-gray text-left mb-0">
-        <p class="m-0">@DateTime.Now.ToString("yyyy/MM/dd hh:mm tt")</p>
-    </div>
+
     <div class="col-12 text-primary text-center ">
         <h1>@nTotalScore</h1>
     </div>
@@ -55,12 +59,19 @@
                         {
                         <div class="col-4 p-1 text-center bg-primary border-bottom-1 border-left-1 border-gray">
                             @scoreboard.Sets[a].First
-                        </div>                      
+                            </div>
                         } else {
+                            if( scoreboard.Sets[a].First > 10)
+                            {
+                                <div class="col-4 p-1 text-center bg-warning text-white border-bottom-1 border-left-1 border-gray">
+                                    X10
+                                </div>
+                            } else {
+                                <div class="col-4 p-1 text-center text-gray border-bottom-1 border-left-1 border-gray">
+                                    @scoreboard.Sets[a].First
+                                </div>
+                            }
 
-                        <div class="col-4 p-1 text-center text-gray border-bottom-1 border-left-1 border-gray">
-                            @scoreboard.Sets[a].First
-                        </div>
                         }
 
                         @if(nIndexSet == a && nIndexScore == 1)
@@ -69,12 +80,20 @@
                             @scoreboard.Sets[a].Second
                         </div>                    
                         } else {
-                        <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray">
-                            @scoreboard.Sets[a].Second
-                        </div>
+                            if( scoreboard.Sets[a].Second > 10)
+                            {
+                                <div class="col-4 p-1 text-center bg-warning text-white border-bottom-1 border-left-1 border-gray">
+                                    X10
+                                </div>
+                            } else
+                            {
+                                <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray">
+                                    @scoreboard.Sets[a].Second
+                                </div>
+                                
+                            }
 
                         }
-
                         
                         @if(nIndexSet == a && nIndexScore == 2)
                         {
@@ -83,10 +102,18 @@
                         </div>
                    
                         } else {
-
-                        <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-right-1 border-gray">
-                            @scoreboard.Sets[a].Third
-                        </div>
+                            if( scoreboard.Sets[a].Third > 10)
+                            {
+                                <div class="col-4 p-1 text-center bg-warning text-white border-bottom-1 border-left-1 border-gray">
+                                    X10
+                                </div>
+                            } else
+                            {
+                                <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-right-1 border-gray">
+                                    @scoreboard.Sets[a].Third
+                                </div>
+                                
+                            }
 
                         }
 
@@ -106,40 +133,43 @@
         @*점수 선택 버튼*@
         <div class="row">
             <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => IncrementCount(10)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Warning"><h2>10</h2</RadzenButton>
+                <RadzenButton Click="() => IncrementCount(11)" class="w-100 h-100 p-1 pt-2" Style="background-color : gold;"><h2 class="text-black">X10</h2</RadzenButton>
             </div>
             <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => IncrementCount(9)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Warning"><h2>9</h2</RadzenButton>
+                <RadzenButton Click="() => IncrementCount(10)" class="w-100 h-100 p-1 pt-2" Style="background-color : yellow;"><h2 class="text-black">10</h2</RadzenButton>
             </div>
             <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => IncrementCount(8)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Danger"><h2>8</h2</RadzenButton>
+                <RadzenButton Click="() => IncrementCount(9)" class="w-100 h-100 p-1 pt-2" Style="background-color : yellow;"><h2 class="text-black">9</h2</RadzenButton>
             </div>
             <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => IncrementCount(7)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Danger"><h2>7</h2</RadzenButton>
+                <RadzenButton Click="() => IncrementCount(8)" class="w-100 h-100 p-1 pt-2" Style="background-color : darkred;"><h2>8</h2</RadzenButton>
             </div>
             <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => IncrementCount(6)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Success"><h2>6</h2</RadzenButton>
+                <RadzenButton Click="() => IncrementCount(7)" class="w-100 h-100 p-1 pt-2" Style="background-color : darkred;"><h2>7</h2</RadzenButton>
             </div>
             <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => IncrementCount(5)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Success"><h2>5</h2</RadzenButton>
+                <RadzenButton Click="() => IncrementCount(6)" class="w-100 h-100 p-1 pt-2" Style="background-color : dodgerblue;"><h2>6</h2</RadzenButton>
             </div>
             <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => IncrementCount(4)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Info"><h2>4</h2</RadzenButton>
+                <RadzenButton Click="() => IncrementCount(5)" class="w-100 h-100 p-1 pt-2" Style="background-color : dodgerblue;"><h2>5</h2</RadzenButton>
             </div>
             <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => IncrementCount(3)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Info"><h2>3</h2</RadzenButton>
+                <RadzenButton Click="() => IncrementCount(4)" class="w-100 h-100 p-1 pt-2" Style="background-color : darkslategrey;"><h2>4</h2</RadzenButton>
             </div>
-            <div class="col-3 p-1" style="height:70px;">
+            <div class="col-2 p-1" style="height:70px;">
+                <RadzenButton Click="() => IncrementCount(3)" class="w-100 h-100 p-1 pt-2" Style="background-color : darkslategrey;"><h2>3</h2</RadzenButton>
+            </div>
+            <div class="col-2 p-1" style="height:70px;">
                 <RadzenButton Click="() => IncrementCount(2)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Light"><h2>2</h2</RadzenButton>
             </div>
-            <div class="col-3 p-1" style="height:70px;">
+            <div class="col-2 p-1" style="height:70px;">
                 <RadzenButton Click="() => IncrementCount(1)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Light"><h2>1</h2</RadzenButton>
             </div>
-            <div class="col-3 p-1" style="height:70px;">
+            <div class="col-2 p-1" style="height:70px;">
                 <RadzenButton Click="() => IncrementCount(0)" class="w-100 h-100 p-1 pt-2" ButtonStyle="ButtonStyle.Light"><h2>0</h2></RadzenButton>
             </div>
-            <div class="col-3 p-1" style="height:70px;">
-                <RadzenButton Click="() => Eraser()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Danger"><i class="fas fa-arrow-left"></i></RadzenButton>
+            <div class="col-4 p-1" style="height:70px;">
+                <RadzenButton Click="() => Eraser()" class="w-100 h-100 p-1" Style="background-color : black;"><i class="fas fa-arrow-left"></i></RadzenButton>
             </div>
 
         </div>
@@ -155,16 +185,13 @@
     <div class="col-12">
         @*이전, 다음, 종료 버튼*@
         <Div Class="row">
-        <div class="col-4" style="height:60px;">  
-            <RadzenButton Click="() => Reset()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Info">RESSET</RadzenButton>
+        <div class="col-6" style="height:60px;">  
+            <RadzenButton Click="() => Reset()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Info">새 게임</RadzenButton>
         </div>
-        <div class="col-4" style="height:60px;">
+        <div class="col-6" style="height:60px;">
             <RadzenButton Click="() => Save()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Secondary" Disabled=@isDisable>저장</RadzenButton>
         </div>
 
-        <div class="col-4" style="height:60px;">
-            <RadzenButton Click="() => End()" class="w-100 h-100 p-1" ButtonStyle="ButtonStyle.Danger">종료</RadzenButton>
-        </div>
         </Div>
 
     </div>
@@ -209,7 +236,7 @@
 
         if(nIndexSet < 12)
         {
-            nTotalScore += count;
+            nTotalScore += count >= 10 ? 10 : count;
 
             switch(nIndexScore)
             {

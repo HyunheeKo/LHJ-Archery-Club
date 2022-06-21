@@ -13,8 +13,8 @@
 @inject NavigationManager NavigationManager
 
 <div class="row">
-    <div class="col-4">
-        <RadzenButton Icon="arrow_back" Click='() => NavigationManager.NavigateTo("/", false)' ></RadzenButton>
+    <div class="col-3">
+        <RadzenButton Icon="arrow_back" ButtonStyle="ButtonStyle.Secondary" Click='() => JSRuntime.InvokeVoidAsync("history.back")'></RadzenButton>
     </div>
     <div class="col-8">
         <h3>기록 보기</h3>
@@ -44,12 +44,19 @@
             if(kv.Key.Date == scheduler.CurrentDate.Date)
             {
                 <div class="row">
-                    <div class="col-7">
-                        <RadzenIcon Icon="calendar_month" IconStyle="Radzen.IconStyle.Secondary" />@kv.Key.ToString("yyyy/MM/dd hh:mm tt")
+                    <div class="col-6">
+                        @*<RadzenIcon Icon="calendar_month" IconStyle="Radzen.IconStyle.Secondary" />@kv.Key.ToString("yyyy/MM/dd hh:mm")*@
+                        <Icon Name="IconName.CalendarDay" Class="mr-2 " TextColor="TextColor.Secondary" />@kv.Key.ToString("yyyy/MM/dd hh:mm")
                     </div>
-                    <div class="col-5 text-right">
-                        <RadzenIcon Icon="assessment" IconStyle="Radzen.IconStyle.Secondary" />점수 : @kv.Value.Score
+                    <div class="col-4 pl-1">
+                        @*<RadzenIcon Icon="assessment" IconStyle="Radzen.IconStyle.Secondary" />점수 : @kv.Value.Score*@
+                        <Icon Name="@("fa-paw")" Class="mr-2" TextColor="TextColor.Secondary" />점수 : @kv.Value.Score
                     </div>
+                    <div class="col-2 text-right">
+                        <Button Size="Size.ExtraSmall" Color="Color.Danger" Clicked="() => OnClicked_Delete(kv.Key)"><Icon Name="IconName.Delete"></Icon> </Button>
+                    </div>
+
+
                 </div>
                 @*세트 스코어 보드*@
                 <div class="row">
@@ -64,18 +71,43 @@
                                     @(a + 1) SET
                                 </div>
                                 <!--점수-->
-                                <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray text-muted">
-                                    @kv.Value.Sets[a].First
-                                </div>
-                                <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray text-muted">
-                                    @kv.Value.Sets[a].Second
-                                </div>
-                                <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-right-1 border-gray text-muted">
-                                    @kv.Value.Sets[a].Third
-                                </div>
+                                @if (kv.Value.Sets[a].First > 10)
+                                {
+                                    <div class="col-4 p-1 text-center bg-warning text-white border-bottom-1 border-left-1 border-gray text-muted">
+                                        X10
+                                    </div>
+                                } else
+                                {
+                                    <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray text-muted">
+                                        @kv.Value.Sets[a].First
+                                    </div>
+                                }
 
+                                @if (kv.Value.Sets[a].Second > 10)
+                                {
+                                    <div class="col-4 p-1 text-center bg-warning text-white border-bottom-1 border-left-1 border-gray text-muted">
+                                        X10
+                                    </div>
+                                } else
+                                {
+                                    <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray text-muted">
+                                        @kv.Value.Sets[a].Second
+                                    </div>
+                                }
+
+                                @if (kv.Value.Sets[a].Third > 10)
+                                {
+                                    <div class="col-4 p-1 text-center bg-warning text-white border-bottom-1 border-left-1 border-gray text-muted">
+                                        X10
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-4 p-1 text-center border-bottom-1 border-left-1 border-gray text-muted">
+                                        @kv.Value.Sets[a].Second
+                                    </div>
+                                }
                             </div>
-
                         </div>
                     }
                 </div>
@@ -193,6 +225,23 @@
         //StateHasChanged();
     }
 
+    async void OnClicked_Delete(DateTime dt)
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", dt.Date);
+
+        // 딕션너리 삭제
+        dicScores.Remove(dt);
+
+        // 로컬 스토리지 삭제
+        await localStorage.RemoveItemAsync(dt.Ticks.ToString());
+
+        StateHasChanged();
+
+        // 스캐줄러 리로드 필요
+        scheduler.Reload();
+
+    }
+
     protected override async Task OnInitializedAsync()
     {
         //_logger.LogInformation("OnInitializedAsync");
@@ -209,7 +258,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if(firstRender)
+        //if(firstRender)
         {
             // 캘린터 셋팅
             SetCalenderScore();                        
